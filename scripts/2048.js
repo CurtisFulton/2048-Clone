@@ -80,127 +80,66 @@ function keyboardInput(e) {
   redrawTiles(fgContext);
 }
 
+function moveBoard(xMov, yMov) {
+	var startX = (xMov == 1 ? numColumns - 1 : 0);
+	var endX = (xMov == 1 ? -1 : numColumns);
+
+	var startY = (yMov == 1 ? numRows - 1 : 0);
+	var endY = (yMov == 1 ? -1 : numRows);
+
+	var xStep = (xMov == 1 ? -1 : 1);
+	var yStep = (yMov == 1 ? -1 : 1);
+
+	for (x = startX; x != endX; x += xStep) {
+		for (y = startY; y != endY; y += yStep) {
+			// Check if the grid is empty
+			if (grid[x][y] == 0)
+				continue;
+
+			// Cache the grid value and remove it from the board
+			var tileVal = grid[x][y];
+			grid[x][y] = 0;
+
+			// Search for where to put it.
+			for (k = 1; k <= Math.max(numColumns, numRows); k++) {
+				var targetX = x + (k * xMov);
+				var targetY = y + (k * yMov);
+
+				if (targetX <= -1 || targetY <= -1 || targetX >= numColumns || targetY >= numRows) {
+					// Make sure the targets are within the grid.
+					targetX = Math.min(Math.max(0, targetX), numColumns - 1);
+					targetY = Math.min(Math.max(0, targetY), numRows - 1);
+
+					grid[targetX][targetY] = tileVal;
+					break;
+				}
+
+				if (grid[targetX][targetY] != 0) {
+					if (grid[targetX][targetY] == tileVal) {
+						grid[targetX][targetY] += tileVal;
+					} else {
+						grid[targetX - xMov][targetY - yMov] = tileVal;
+					}
+
+					break;
+				}
+			}
+		}
+	}
+}
+
 function moveLeft() {
-  for (i = 1; i < numColumns; i++) {
-    for (j = 0; j < numRows; j++) {
-      if (grid[i][j] == 0) 
-        continue;
-      
-      var tileVal = grid[i][j];
-      grid[i][j] = 0;
-      
-      for (k = 1; k <= numColumns; k++) {
-        var targetCol = i - k;
-        
-        if (targetCol == -1) {
-          grid[0][j] = tileVal;
-          break;
-        }
-        
-        var targetVal = grid[targetCol][j];
-        
-        if (targetVal != 0) {
-          if (targetVal == tileVal) {
-            grid[targetCol][j] += tileVal;
-          } else {
-            grid[targetCol + 1][j] = tileVal; 
-          }
-          break;
-        }
-      }
-    }
-  }
+	moveBoard(-1, 0);
 }
 
 function moveRight() {
-  for (i = numColumns - 1; i >= 0; i--) {
-    for (j = 0; j < numRows; j++) {
-      if (grid[i][j] == 0) 
-        continue;
-      
-      
-      var tileVal = grid[i][j];
-      grid[i][j] = 0;
-      
-      for (k = 1; k <= numColumns; k++) {
-        var targetCol = i + k;
-        
-        if (targetCol >= numColumns) {
-          grid[numColumns - 1][j] = tileVal; 
-          break;
-        }
-        
-        var targetVal = grid[targetCol][j]; 
-        
-        if (targetVal != 0) {
-          if (targetVal == tileVal) {
-            grid[targetCol][j] += tileVal;
-          } else {
-            grid[targetCol -1][j] = tileVal; 
-          }
-          break;
-        }
-      }
-    }
-  }
+	moveBoard(1, 0);
 }
 
 function moveUp() {
-  for (j = 1; j < numRows; j++) {
-    for (i = 0; i < numColumns; i++) {
-      if (grid[i][j] == 0)
-        continue;
-      
-      var tileVal = grid[i][j];
-      grid[i][j] = 0;
-      
-      for (k = 1; k <= numRows; k++) {
-        var targetRow = j - k;
-        var targetVal = grid[i][targetRow];
-        
-        if (targetRow == -1) {
-          grid[i][0] = tileVal; 
-          break;
-        }
-        
-        if (targetVal != 0) {
-          if (targetVal == tileVal)
-            grid[i][targetRow] += tileVal;
-          else
-            grid[i][targetRow + 1] = tileVal;  
-          break;
-        }
-      }
-    }
-  }
+	moveBoard(0, -1);
 }
 
 function moveDown() {
-  for (j = numRows - 1; j >= 0; j--) {
-    for (i = 0; i < numColumns; i++) {
-      if (grid[i][j] == 0)
-        continue;
-      
-      var tileVal = grid[i][j];
-      grid[i][j] = 0;
-      
-      for (k = 1; k <= numRows; k++) {
-        var targetRow = j + k;
-        var targetVal = grid[i][targetRow];
-        
-        if (targetRow >= numRows) {
-          grid[i][targetRow - 1] = tileVal; 
-          break;
-        }
-        
-        if (targetVal != 0) {
-          if (targetVal == tileVal)
-            grid[i][targetRow] += tileVal;
-          else
-            grid[i][targetRow - 1] = tileVal;  
-          break;
-        }
-      }
-    }
-  }
+	moveBoard(0, 1);
 }
