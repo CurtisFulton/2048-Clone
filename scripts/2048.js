@@ -1,48 +1,38 @@
 /****************************************************/
-/*				Global Varibables                   */
+/*				    2048 Prototype                  */
 /****************************************************/
+function GameManager2048(columns, rows) {
+	this.numColumns = numColumns;
+	this.numRows = rows;
 
-// Stores the state of the game
-var grid;
-
-var numStartingTiles = 2;
-var numRows = 4;
-var numColumns = 4;
-
-
-/****************************************************/
-/*				    Game Logic                      */
-/****************************************************/
-window.addEventListener("load", function(e) {
-	resetGame();
-	window.addEventListener('keyup', this.keyboardInput, false);
-})
-
-function resetGame() {
-  grid = new Array(numColumns);
-  // Initialize the grid, and set all the values to 0 (So they are all empty)
-  for (i = 0; i < numColumns; i++) {
-    grid[i] = new Array(numRows)
-    
-    for (j = 0; j < numRows; j++) {
-      grid[i][j] = 0;
-    }
-  }
-  
-  // Set the starting tiles
-  for (i = 0; i < numStartingTiles; i++) {
-    addNewTile();
-  }
+	this.grid;
 }
 
-function addNewTile() {
-    // Sometimes this picks the same value twice. 
+GameManager2048.prototype.startNewGame = function() {
+	var newGrid = new Array(numColumns);
+	// Initialize the grid, and set all the values to 0 (So they are all empty)
+	for (i = 0; i < numColumns; i++) {
+		newGrid[i] = new Array(numRows)
+
+		for (j = 0; j < numRows; j++) {
+		  newGrid[i][j] = 0;
+		}
+	}
+	this.grid = newGrid;
+
+	// Add 2 tiles to the starting board
+	this.addNewTile();
+	this.addNewTile();
+}
+
+GameManager2048.prototype.addNewTile = function() {
+	// Sometimes this picks the same value twice. 
     var x = Math.floor(Math.random() * numColumns);
     var y = Math.floor(Math.random() * numRows); 
     
     // Make sure we find a grid spot that hasn't been chosen before.
     var numAttempts = 0
-    while (grid[x][y] != 0) {
+    while (this.grid[x][y] != 0) {
       var x = Math.floor(Math.random() * numColumns);
       var y = Math.floor(Math.random() * numRows); 
       
@@ -51,40 +41,15 @@ function addNewTile() {
     }
     
     var startingVal = Math.floor((Math.random() * 2) + 1);
-    grid[x][y] = startingVal;
+    this.grid[x][y] = startingVal;
 }
 
-function keyboardInput(e) {
-  switch (e.keyCode) { 
-    case 37:
-    case 65:
-      moveLeft();
-      break;
-    case 38:
-    case 87:
-      moveUp();
-      break;
-    case 39:
-    case 68:
-      moveRight();
-      break;
-    case 40:
-    case 83:
-      moveDown();
-      break;
-    default:
-      return;
-  }
-  
-  redrawTiles(fgContext);
-}
+GameManager2048.prototype.moveBoard = function(xMov, yMov) {
+	var startX = (xMov == 1 ? this.numColumns - 1 : 0);
+	var endX = (xMov == 1 ? -1 : this.numColumns);
 
-function moveBoard(xMov, yMov) {
-	var startX = (xMov == 1 ? numColumns - 1 : 0);
-	var endX = (xMov == 1 ? -1 : numColumns);
-
-	var startY = (yMov == 1 ? numRows - 1 : 0);
-	var endY = (yMov == 1 ? -1 : numRows);
+	var startY = (yMov == 1 ? this.numRows - 1 : 0);
+	var endY = (yMov == 1 ? -1 : this.numRows);
 
 	var xStep = (xMov == 1 ? -1 : 1);
 	var yStep = (yMov == 1 ? -1 : 1);
@@ -94,25 +59,25 @@ function moveBoard(xMov, yMov) {
 
 	for (x = startX; x != endX; x += xStep) {
 		for (y = startY; y != endY; y += yStep) {
-			// Check if the grid is empty
-			if (grid[x][y] == 0)
+			// Check if the tile is empty
+			if (this.grid[x][y] == 0)
 				continue;
 
 			// Cache the grid value and remove it from the board
-			var tileVal = grid[x][y];
-			grid[x][y] = 0;
+			var tileVal = this.grid[x][y];
+			this.grid[x][y] = 0;
 
 			// Search for where to put it.
-			for (k = 1; k <= Math.max(numColumns, numRows); k++) {
+			for (k = 1; k <= Math.max(this.numColumns, this.numRows); k++) {
 				var targetX = x + (k * xMov);
 				var targetY = y + (k * yMov);
 
-				if (targetX <= -1 || targetY <= -1 || targetX >= numColumns || targetY >= numRows) {
+				if (targetX <= -1 || targetY <= -1 || targetX >= this.numColumns || targetY >= this.numRows) {
 					// Make sure the targets are within the grid.
-					targetX = Math.min(Math.max(0, targetX), numColumns - 1);
-					targetY = Math.min(Math.max(0, targetY), numRows - 1);
+					targetX = Math.min(Math.max(0, targetX), this.numColumns - 1);
+					targetY = Math.min(Math.max(0, targetY), this.numRows - 1);
 
-					grid[targetX][targetY] = tileVal;
+					this.grid[targetX][targetY] = tileVal;
 
 					if (targetX != x || targetY != y) 
 						numMovedTiles++;
@@ -120,14 +85,14 @@ function moveBoard(xMov, yMov) {
 					break;
 				}
 
-				if (grid[targetX][targetY] != 0) {
-					if (grid[targetX][targetY] == tileVal) {
-						grid[targetX][targetY] += tileVal;
+				if (this.grid[targetX][targetY] != 0) {
+					if (this.grid[targetX][targetY] == tileVal) {
+						this.grid[targetX][targetY] += 1;
 
 						if (targetX != x || targetY != y) 
 							numMovedTiles++;
 					} else {
-						grid[targetX - xMov][targetY - yMov] = tileVal;
+						this.grid[targetX - xMov][targetY - yMov] = tileVal;
 
 						if (targetX - xMov != x || targetY - yMov != y) 
 							numMovedTiles++;
@@ -140,23 +105,23 @@ function moveBoard(xMov, yMov) {
 	}
 
 	if (numMovedTiles > 0)
-  		addNewTile();
-  	else 
-  		console.log("Illegal move");
+  		this.addNewTile();
+
+  	return numMovedTiles;
 }
 
-function moveLeft() {
-	moveBoard(-1, 0);
+GameManager2048.prototype.moveLeft = function() {
+	return (this.moveBoard(-1, 0) > 0 ? true : false);
 }
 
-function moveRight() {
-	moveBoard(1, 0);
+GameManager2048.prototype.moveRight = function() {
+	return (this.moveBoard(1, 0) > 0 ? true : false)
 }
 
-function moveUp() {
-	moveBoard(0, -1);
+GameManager2048.prototype.moveUp = function() {
+	return (this.moveBoard(0, -1) > 0 ? true : false)
 }
 
-function moveDown() {
-	moveBoard(0, 1);
+GameManager2048.prototype.moveDown = function() {
+	return (this.moveBoard(0, 1) > 0 ? true : false)
 }

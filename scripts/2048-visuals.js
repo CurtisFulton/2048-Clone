@@ -13,16 +13,48 @@ var tileColour = "#EEE4DA";
 var emptyTileColour = "rgba(238, 228, 218, 0.5)";
 
 // Used to get the size of the canvas
+var numColumns = 4;
+var numRows = 4;
 var tileRadius = 4
 var tileSize = 100;
 var tilePadding = 12.5;
 var actualTileSize = tileSize - tilePadding; 
 
+var gameManager = new GameManager2048(numColumns, numRows);
+
 window.addEventListener("load", function(e) {
+	gameManager.startNewGame();
+	window.addEventListener('keyup', this.keyboardInput, false);
+
 	resizeCanvases();
 	drawBackground(bgCanvas, bgContext);
 	redrawTiles(fgContext);
 })
+
+function keyboardInput(e) {
+	switch (e.keyCode) { 
+		case 37:
+		case 65:
+			gameManager.moveLeft();
+			break;
+		case 38:
+		case 87:
+			gameManager.moveUp();
+			break;
+		case 39:
+		case 68:
+			gameManager.moveRight();
+			break;
+		case 40:
+		case 83:
+			gameManager.moveDown();
+			break;
+		default:
+		  	return;
+	}
+
+	redrawTiles(fgContext);
+}
 
 function resizeCanvases() {
 	var canvasWidth = numColumns * tileSize + tilePadding;
@@ -72,7 +104,7 @@ function redrawTiles(context) {
       var xPos = (i * tileSize) + tilePadding;
       var yPos = (j * tileSize) + tilePadding;
 
-      drawTile(context, grid[i][j], xPos, yPos, actualTileSize)
+      drawTile(context, gameManager.grid[i][j], xPos, yPos, actualTileSize)
     }
   }
 }
@@ -89,11 +121,6 @@ function drawTile(context, value, x, y, size) {
   context.font = "25px Arial"
   context.textAlign = "center";
   context.textBaseline = "middle";
- /*
-  if (value == 1)
-    value = 2;
-  else
-    value *= value;
-  */
-  context.fillText(value, x + (size / 2.0), y + (size / 2.0));
+
+  context.fillText(Math.pow(2, value), x + (size / 2.0), y + (size / 2.0));
 }
