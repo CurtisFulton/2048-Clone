@@ -13,15 +13,16 @@ var tileColour = "#EEE4DA";
 var emptyTileColour = "rgba(238, 228, 218, 0.5)";
 
 // Used to get the size of the canvas
-var numRows = 4;
-var numColumns = 4;
 var tileRadius = 4
 var tileSize = 100;
 var tilePadding = 12.5;
 var actualTileSize = tileSize - tilePadding; 
 
-resizeCanvases();
-drawBackground(bgCanvas, bgContext);
+window.addEventListener("load", function(e) {
+	resizeCanvases();
+	drawBackground(bgCanvas, bgContext);
+	redrawTiles(fgContext);
+})
 
 function resizeCanvases() {
 	var canvasWidth = numColumns * tileSize + tilePadding;
@@ -61,4 +62,38 @@ function drawRoundedRect(ctx, x, y, size, radius) {
   ctx.lineTo(x, y+radius);
   ctx.quadraticCurveTo(x, y, x+radius, y);
   ctx.fill();  
+}
+
+function redrawTiles(context) {
+  context.clearRect(0, 0, fgCanvas.width, fgCanvas.height);
+  
+  for (i = 0; i < numColumns; i++) {
+    for (j = 0; j < numRows; j++) {
+      var xPos = (i * tileSize) + tilePadding;
+      var yPos = (j * tileSize) + tilePadding;
+
+      drawTile(context, grid[i][j], xPos, yPos, actualTileSize)
+    }
+  }
+}
+
+function drawTile(context, value, x, y, size) {
+  if (value == 0)
+    return;
+  
+  context.fillStyle = tileColour;
+  drawRoundedRect(context, x, y, size, tileRadius);
+  
+  // Set up the text
+  context.fillStyle = "#000";
+  context.font = "25px Arial"
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+ /*
+  if (value == 1)
+    value = 2;
+  else
+    value *= value;
+  */
+  context.fillText(value, x + (size / 2.0), y + (size / 2.0));
 }
