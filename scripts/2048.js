@@ -76,7 +76,6 @@ function keyboardInput(e) {
       return;
   }
   
-  addNewTile();
   redrawTiles(fgContext);
 }
 
@@ -89,6 +88,9 @@ function moveBoard(xMov, yMov) {
 
 	var xStep = (xMov == 1 ? -1 : 1);
 	var yStep = (yMov == 1 ? -1 : 1);
+
+	// Keep track of how many tiles have been moved
+	var numMovedTiles = 0;
 
 	for (x = startX; x != endX; x += xStep) {
 		for (y = startY; y != endY; y += yStep) {
@@ -111,14 +113,24 @@ function moveBoard(xMov, yMov) {
 					targetY = Math.min(Math.max(0, targetY), numRows - 1);
 
 					grid[targetX][targetY] = tileVal;
+
+					if (targetX != x || targetY != y) 
+						numMovedTiles++;
+					
 					break;
 				}
 
 				if (grid[targetX][targetY] != 0) {
 					if (grid[targetX][targetY] == tileVal) {
 						grid[targetX][targetY] += tileVal;
+
+						if (targetX != x || targetY != y) 
+							numMovedTiles++;
 					} else {
 						grid[targetX - xMov][targetY - yMov] = tileVal;
+
+						if (targetX - xMov != x || targetY - yMov != y) 
+							numMovedTiles++;
 					}
 
 					break;
@@ -126,6 +138,11 @@ function moveBoard(xMov, yMov) {
 			}
 		}
 	}
+
+	if (numMovedTiles > 0)
+  		addNewTile();
+  	else 
+  		console.log("Illegal move");
 }
 
 function moveLeft() {
