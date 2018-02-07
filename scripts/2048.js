@@ -26,22 +26,29 @@ GameManager2048.prototype.startNewGame = function() {
 }
 
 GameManager2048.prototype.addNewTile = function() {
-	// Sometimes this picks the same value twice. 
-    var x = Math.floor(Math.random() * numColumns);
-    var y = Math.floor(Math.random() * numRows); 
-    
-    // Make sure we find a grid spot that hasn't been chosen before.
-    var numAttempts = 0
-    while (this.grid[x][y] != 0) {
-      var x = Math.floor(Math.random() * numColumns);
-      var y = Math.floor(Math.random() * numRows); 
-      
-      if (numAttempts++ > 100)
-        break;
-    }
-    
+	var possibleIndexes = []
+
+
+	for (i = 0; i < this.numColumns; i++) {
+		for (j = 0; j < this.numRows; j++) {
+			if (this.grid[i][j] == 0) {
+				possibleIndexes.push({ 
+					x : i,
+					y : j
+				});
+			}
+		}
+	}
+
+	var newPos = possibleIndexes[Math.floor(Math.random() * possibleIndexes.length)];
+
     var startingVal = Math.floor((Math.random() * 2) + 1);
-    this.grid[x][y] = startingVal;
+    this.grid[newPos.x][newPos.y] = startingVal;
+
+    if (possibleIndexes.length <= 1 && !this.movementPossible()) {
+		alert("Game Over!");
+		return;
+	}
 }
 
 GameManager2048.prototype.moveBoard = function(xMov, yMov) {
@@ -108,6 +115,30 @@ GameManager2048.prototype.moveBoard = function(xMov, yMov) {
   		this.addNewTile();
 
   	return numMovedTiles;
+}
+
+GameManager2048.prototype.movementPossible = function() {
+	for (x = 0; x < this.numColumns; x++) {
+		for (y = 0; y < this.numRows; y++) {
+			var tileVal = this.grid[x][y];
+			// If there is a single free space, there is possible movement
+			if (tileVal == 0)
+				return true;
+
+			// Only need to check down and right. Left and up were checked before or weren't possible.
+			// This is only because that is the order the loops run in.
+
+			// Check down
+			if (y != (numRows - 1) && this.grid[x][y + 1] == tileVal)
+				return true;
+
+			// Check right
+			if (x != (numColumns - 1) && this.grid[x + 1][y] == tileVal)
+				return true;
+		}
+	}
+
+	return false;
 }
 
 GameManager2048.prototype.moveLeft = function() {
