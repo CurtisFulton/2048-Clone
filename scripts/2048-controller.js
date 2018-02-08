@@ -1,5 +1,5 @@
 /****************************************************/
-/*				Global Varibables                   */
+/*				      Global Varibables                   */
 /****************************************************/
 
 var bgCanvas = document.getElementById("background");
@@ -23,13 +23,17 @@ var actualTileSize = tileSize - tilePadding;
 var gameManager = new GameManager2048(numColumns, numRows);
 
 window.addEventListener("load", function(e) {
-	gameManager.startNewGame();
-	window.addEventListener('keyup', this.keyboardInput, false);
+  gameManager.startNewGame();
+  window.addEventListener('keyup', this.keyboardInput, false);
 
-	resizeCanvases();
-	drawBackground(bgCanvas, bgContext);
-	redrawTiles(fgContext);
-})
+  resizeCanvases();
+  drawBackground(bgCanvas, bgContext);
+  redrawTiles(fgContext);
+});
+
+/****************************************************/
+/*                    Inputs                        */
+/****************************************************/
 
 function keyboardInput(e) {
 	switch (e.keyCode) { 
@@ -55,6 +59,11 @@ function keyboardInput(e) {
 
 	redrawTiles(fgContext);
 }
+
+
+/****************************************************/
+/*                 Visuals/Drawing                  */
+/****************************************************/
 
 function resizeCanvases() {
 	var canvasWidth = numColumns * tileSize + tilePadding;

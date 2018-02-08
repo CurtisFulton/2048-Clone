@@ -28,7 +28,6 @@ GameManager2048.prototype.startNewGame = function() {
 GameManager2048.prototype.addNewTile = function() {
 	var possibleIndexes = []
 
-
 	for (i = 0; i < this.numColumns; i++) {
 		for (j = 0; j < this.numRows; j++) {
 			if (this.grid[i][j] == 0) {
