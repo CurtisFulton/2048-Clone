@@ -1,23 +1,82 @@
-var network;
-var illegalMoves = 0;
+var networks;
+
+var numNetworks = 50;
+var numHiddenLayers = 2;
+var hiddenNodes = 16;
+
+var intervalID = 0;
+var delayBetweenMoves = 20;
 
 window.addEventListener("load", function(e) {
-	network = new NeuralNetwork(17, 4);
-	network.randomizeNetwork(1, 16);
+	networks = new Array(numNetworks);
+
+	for (var i = 0; i < networks.length; i++) {
+		networks[i] = new NetworkInstance();
+	}
+
+	networks.forEach(function(network) {
+		network.gameManager.onGameOver = function() {
+			network.gameFinished = true;
+		}
+	});
+
+	intervalID = setInterval(trainingLoop, delayBetweenMoves);
 });
 
-setInterval(function() {
-	for (var x = 0; x < gameManager.numColumns; x++) {
-		for (var y = 0; y < gameManager.numRows; y++) {
-			var val = gameManager.grid[x][y];
-			var index = (x * gameManager.numColumns) + y;
 
-			network.setInput(index, val);
+function trainingLoop() {
+	var gamesStillRunning = 0;
+	var bestNetwork = 0;
+
+	for (var i = 0; i < networks.length; i++) {
+		if (!networks[i].gameFinished){
+			if (networks[i].gameManager.score > networks[bestNetwork].gameManager.score || networks[bestNetwork].gameFinished)
+				bestNetwork = i;
+
+			networks[i].nextMove();
+			gamesStillRunning++;
+		}
+
+
+	}
+
+	gameManager = networks[bestNetwork].gameManager;
+  	redrawTiles(fgContext);
+
+	if (gamesStillRunning == 0) {
+		alert("Game Finished");
+		clearInterval(intervalID);
+	}
+
+	console.log(gamesStillRunning);
+};
+
+
+// Class to contain a single instance of a neural network and game
+function NetworkInstance() {
+	this.gameFinished = false;
+
+	this.numIllegalMoves = 0;
+	this.neuralNetwork = new NeuralNetwork(17, 4);
+	this.gameManager = new GameManager2048(numColumns, numRows);
+
+	this.neuralNetwork.randomizeNetwork(numHiddenLayers, hiddenNodes);
+	this.gameManager.startNewGame();
+}
+
+NetworkInstance.prototype.nextMove = function() {
+
+	for (var x = 0; x < this.gameManager.numColumns; x++) {
+		for (var y = 0; y < this.gameManager.numRows; y++) {
+			var val = this.gameManager.grid[x][y];
+			var index = (x * this.gameManager.numColumns) + y;
+
+			this.neuralNetwork.setInput(index, val);
 		}
 	}
-	network.setInput(network.input.length - 1, illegalMoves);
-	network.feedForward();
-	var outputs = network.getOutput();
+	this.neuralNetwork.setInput(this.neuralNetwork.input.length - 1, this.illegalMoves);
+	this.neuralNetwork.feedForward();
+	var outputs = this.neuralNetwork.getOutput();
 	var networkIndex = 0;
 
 	for (var i = 0; i < outputs.length; i++) {
@@ -28,18 +87,20 @@ setInterval(function() {
 
 	var movedTiles;
 	switch(networkIndex) {
-		case 0: movedTiles = gameManager.moveLeft(); break;
-		case 1: movedTiles = gameManager.moveRight(); break;
-		case 2: movedTiles = gameManager.moveDown(); break;
-		case 3: movedTiles = gameManager.moveUp(); break;
+		case 0: movedTiles = this.gameManager.moveLeft(); break;
+		case 1: movedTiles = this.gameManager.moveRight(); break;
+		case 2: movedTiles = this.gameManager.moveDown(); break;
+		case 3: movedTiles = this.gameManager.moveUp(); break;
+		default: console.log("Error"); break;
 	}
 
 	if (movedTiles == 0) {
-		illegalMoves++;
+		this.illegalMoves++;
 	} else {
-		illegalMoves = 0;
+		this.illegalMoves = 0;
 	}
 
-
-	redrawTiles(fgContext);
-}, 250);
+	if (this.illegalMoves > 10) {
+		this.gameManager.onGameOver();
+	}
+}

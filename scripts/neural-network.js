@@ -59,8 +59,6 @@ NeuralNetwork.prototype.randomizeNetwork = function(numHiddenLayers, nodesPerLay
 	var newLayer = this.createLayer(this.numOutputs, nodesPerLayer); 
 	this.internalLayers.push(newLayer.nodes);
 	this.weights.push(newLayer.weights);
-
-	console.log(this);
 };
 
 NeuralNetwork.prototype.createLayer = function(numNodes, numInputs) {

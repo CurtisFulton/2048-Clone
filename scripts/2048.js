@@ -6,6 +6,9 @@ function GameManager2048(columns, rows) {
 	this.numRows = rows;
 
 	this.grid;
+	this.onGameOver;
+
+	this.score = 0;
 }
 
 GameManager2048.prototype.startNewGame = function() {
@@ -45,7 +48,7 @@ GameManager2048.prototype.addNewTile = function() {
     this.grid[newPos.x][newPos.y] = startingVal;
 
     if (possibleIndexes.length <= 1 && !this.movementPossible()) {
-		alert("Game Over!");
+		this.onGameOver();
 		return;
 	}
 }
@@ -94,7 +97,7 @@ GameManager2048.prototype.moveBoard = function(xMov, yMov) {
 				if (this.grid[targetX][targetY] != 0) {
 					if (this.grid[targetX][targetY] == tileVal) {
 						this.grid[targetX][targetY] += 1;
-
+						this.score += Math.pow(2, this.grid[targetX][targetY]);
 						if (targetX != x || targetY != y) 
 							numMovedTiles++;
 					} else {
