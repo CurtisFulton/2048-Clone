@@ -5,7 +5,7 @@ var numHiddenLayers = 2;
 var hiddenNodes = 16;
 
 var intervalID = 0;
-var delayBetweenMoves = 20;
+var delayBetweenMoves = 0;
 
 window.addEventListener("load", function(e) {
 	networks = new Array(numNetworks);
@@ -44,11 +44,15 @@ function trainingLoop() {
   	redrawTiles(fgContext);
 
 	if (gamesStillRunning == 0) {
-		alert("Game Finished");
 		clearInterval(intervalID);
+		var highscore = 0;
+		for (var i = 0; i < networks.length; i++) {
+			if (networks[i].gameManager.score > highscore) {
+				highscore = networks[i].gameManager.score;
+			}
+		}
+		alert("Game Finished. Highscore: " + highscore);
 	}
-
-	console.log(gamesStillRunning);
 };
 
 
@@ -74,7 +78,7 @@ NetworkInstance.prototype.nextMove = function() {
 			this.neuralNetwork.setInput(index, val);
 		}
 	}
-	this.neuralNetwork.setInput(this.neuralNetwork.input.length - 1, this.illegalMoves);
+	this.neuralNetwork.setInput(this.neuralNetwork.input.length - 1, this.numIllegalMoves);
 	this.neuralNetwork.feedForward();
 	var outputs = this.neuralNetwork.getOutput();
 	var networkIndex = 0;
@@ -95,12 +99,12 @@ NetworkInstance.prototype.nextMove = function() {
 	}
 
 	if (movedTiles == 0) {
-		this.illegalMoves++;
+		this.numIllegalMoves++;
 	} else {
-		this.illegalMoves = 0;
+		this.numIllegalMoves = 0;
 	}
 
-	if (this.illegalMoves > 10) {
+	if (this.numIllegalMoves > 100) {
 		this.gameManager.onGameOver();
 	}
 }
