@@ -86,21 +86,20 @@ NeuralNetwork.prototype.combineNetworks = function(networkB, mutationChance) {
 	newNet.randomizeNetwork(this.internalLayers.length - 1, this.weights[0].length);
 
 	for (let i = 0; i < this.weights.length; i++) {
+		// Makes it so at least 1/4 of each network is included
+		let crossOverIndex = Math.floor((Math.random() * (inputCount / 2)) + (inputCount / 4));
 		for (let j = 0; j < this.weights[i].length; j++) {
-			let inputCount = this.weights[i][j].length;
-			// Makes it so at least 1/4 of each network is included
-			let crossOverIndex = Math.floor((Math.random() * (inputCount / 2)) + (inputCount / 4));
-			for (var k = 0; k < this.weights[i][j].length; k++) {
-				if (k < crossOverIndex)
-					newNet.weights[i][j][k] = this.weights[i][j][k];
-				else
-					newNet.weights[i][j][k] = networkB.weights[i][j][k];
+			let inputCount = this.weights[i].length;
 
-				// If theres a mutation
-				if (Math.random() < mutationChance) {
-					newNet.weights[i][j][k] = (Math.random() - 0.5) * 2;
-				}
-			}
+			if (k < crossOverIndex)
+				newNet.weights[i][j] = this.weights[i][j];
+			else
+				newNet.weights[i][j] = networkB.weights[i][j];
+
+			// If theres a mutation
+			if (Math.random() < mutationChance) {
+				newNet.weights[i][j][Math.floor(Math.random() * (newNet.weights[i][j].length + 1))] = (Math.random() - 0.5) * 2;
+			} 
 		}
 	}
 

@@ -9,7 +9,24 @@
 	<canvas id="background"></canvas>
 	<canvas id="foreground"></canvas>
 	
+	<div class="stats-container">
+		<div class="gen">
+			<h4>Gen Num: </h4>
+			<p id="gen-num">0</p>
+		</div>
+		<div class="high-score">
+			<h4>Highscore of this generation: </h4>
+			<p id="current-high-score">0</p>
+		</div>
+		<div class="avg">
+			<h4>Average of Previous gen: </h4>
+			<p id="pev-avg">0</p>
+		</div>
+	</div>
 	
+	<div id="chartContainer" style="height: 400px; width: 100%;"></div>
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"> </script>
+
 	<script type="text/javascript" src="scripts/2048.js"></script>
 	<script type="text/javascript" src="scripts/2048-controller.js"></script>
 	<script type="text/javascript" src="scripts/neural-network.js"></script>
