@@ -55,7 +55,7 @@ NeuralNetwork.prototype.randomizeNetwork = function(numHiddenLayers, nodesPerLay
 		this.weights.push(newLayer.weights);
 	}
 
-	// The last layer has a different number of nodes in it, so it needs to be done separately
+	// The last layer (output layer) has a different number of nodes in it, so it needs to be done separately
 	var newLayer = this.createLayer(this.numOutputs, nodesPerLayer); 
 	this.internalLayers.push(newLayer.nodes);
 	this.weights.push(newLayer.weights);
@@ -79,3 +79,30 @@ NeuralNetwork.prototype.createLayer = function(numNodes, numInputs) {
 	return { nodes : nodes, weights: weights };
 };
 
+// Assumes both networks are the same size
+NeuralNetwork.prototype.combineNetworks = function(networkB, mutationChance) {
+	// Use this networks input/output count as blueprint
+	let newNet = new NeuralNetwork(this.input.length, this.numOutputs);
+	newNet.randomizeNetwork(this.internalLayers.length - 1, this.weights[0].length);
+
+	for (let i = 0; i < this.weights.length; i++) {
+		for (let j = 0; j < this.weights[i].length; j++) {
+			let inputCount = this.weights[i][j].length;
+			// Makes it so at least 1/4 of each network is included
+			let crossOverIndex = Math.floor((Math.random() * (inputCount / 2)) + (inputCount / 4));
+			for (var k = 0; k < this.weights[i][j].length; k++) {
+				if (k < crossOverIndex)
+					newNet.weights[i][j][k] = this.weights[i][j][k];
+				else
+					newNet.weights[i][j][k] = networkB.weights[i][j][k];
+
+				// If theres a mutation
+				if (Math.random() < mutationChance) {
+					newNet.weights[i][j][k] = (Math.random() - 0.5) * 2;
+				}
+			}
+		}
+	}
+
+	return newNet;
+};

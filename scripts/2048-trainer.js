@@ -1,6 +1,6 @@
 var networks;
 
-var numNetworks = 50;
+var numNetworks = 1;
 var numHiddenLayers = 2;
 var hiddenNodes = 16;
 
@@ -9,6 +9,15 @@ var delayBetweenMoves = 0;
 
 window.addEventListener("load", function(e) {
 	networks = new Array(numNetworks);
+
+	let netA = new NeuralNetwork(17, 4);
+	let netB = new NeuralNetwork(17, 4);
+	netA.randomizeNetwork(numHiddenLayers, hiddenNodes);
+	netB.randomizeNetwork(numHiddenLayers, hiddenNodes);
+
+	console.log(netA);
+	console.log(netB);
+	console.log(netA.combineNetworks(netB, 0.05));
 
 	for (var i = 0; i < networks.length; i++) {
 		networks[i] = new NetworkInstance();
