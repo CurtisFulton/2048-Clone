@@ -20,10 +20,9 @@ var tileSize = 100;
 var tilePadding = 12.5;
 var actualTileSize = tileSize - tilePadding; 
 
-var gameManager = new GameManager2048(numColumns, numRows);
+var gameManager;
 
 window.addEventListener("load", function(e) {
-  gameManager.startNewGame();
   window.addEventListener('keyup', this.keyboardInput, false);
 
   resizeCanvases();
@@ -106,18 +105,29 @@ function drawRoundedRect(ctx, x, y, size, radius) {
 }
 
 function redrawTiles(context) {
+  if (!gameManager)
+    return;
+
   context.clearRect(0, 0, fgCanvas.width, fgCanvas.height);
-  
+  max = 0;
+  for (i = 0; i < numColumns; i++) {
+    for (j = 0; j < numRows; j++) {
+      if (gameManager.grid[i][j] > max)
+        max = gameManager.grid[i][j];
+    }
+  }
+
   for (i = 0; i < numColumns; i++) {
     for (j = 0; j < numRows; j++) {
       var xPos = (i * tileSize) + tilePadding;
       var yPos = (j * tileSize) + tilePadding;
 
-      drawTile(context, gameManager.grid[i][j], xPos, yPos, actualTileSize)
+      var val = (gameManager.grid[i][j] / max)
+      drawTile(context, val, xPos, yPos, actualTileSize)
     }
   }
 }
-
+var max = 0
 function drawTile(context, value, x, y, size) {
   if (value == 0)
     return;
@@ -131,5 +141,10 @@ function drawTile(context, value, x, y, size) {
   context.textAlign = "center";
   context.textBaseline = "middle";
 
-  context.fillText(Math.pow(2, value), x + (size / 2.0), y + (size / 2.0));
+  var output = Math.floor(value * max) + " / " + max;
+
+  if (Math.floor(value * max) == max)
+    output = "1";
+
+  context.fillText(output, x + (size / 2.0), y + (size / 2.0));
 }

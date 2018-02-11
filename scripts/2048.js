@@ -1,7 +1,7 @@
 /****************************************************/
 /*				    2048 Prototype                  */
 /****************************************************/
-function GameManager2048(columns, rows) {
+function GameManager2048(columns, rows, seed) {
 	this.numColumns = numColumns;
 	this.numRows = rows;
 
@@ -9,9 +9,11 @@ function GameManager2048(columns, rows) {
 	this.onGameOver;
 
 	this.score = 0;
+	this.seed = seed || Math.random() * 1092381024;
+	this.myRng = new Math.seedrandom(this.seed);
 }
 
-GameManager2048.prototype.startNewGame = function() {
+GameManager2048.prototype.startNewGame = function(seed) {
 	var newGrid = new Array(numColumns);
 	// Initialize the grid, and set all the values to 0 (So they are all empty)
 	for (i = 0; i < numColumns; i++) {
@@ -22,6 +24,8 @@ GameManager2048.prototype.startNewGame = function() {
 		}
 	}
 	this.grid = newGrid;
+	this.score = 0;
+	this.myRng = new Math.seedrandom(seed || this.seed);
 
 	// Add 2 tiles to the starting board
 	this.addNewTile();
@@ -42,9 +46,10 @@ GameManager2048.prototype.addNewTile = function() {
 		}
 	}
 
-	var newPos = possibleIndexes[Math.floor(Math.random() * possibleIndexes.length)];
+	var newIndex = Math.floor(this.myRng.quick() * possibleIndexes.length);
+	var newPos = possibleIndexes[newIndex];
 
-    var startingVal = Math.floor((Math.random() * 2) + 1);
+    var startingVal = Math.floor((this.myRng.quick() * 2) + 1);
     this.grid[newPos.x][newPos.y] = startingVal;
 
     if (possibleIndexes.length <= 1 && !this.movementPossible()) {
@@ -158,3 +163,4 @@ GameManager2048.prototype.moveUp = function() {
 GameManager2048.prototype.moveDown = function() {
 	return (this.moveBoard(0, 1) > 0 ? true : false)
 }
+
