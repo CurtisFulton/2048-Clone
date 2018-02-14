@@ -2,7 +2,7 @@
 /*				    2048 Prototype                  */
 /****************************************************/
 function GameManager2048(columns, rows, seed) {
-	this.numColumns = numColumns;
+	this.numColumns = columns;
 	this.numRows = rows;
 
 	this.grid;
@@ -14,12 +14,12 @@ function GameManager2048(columns, rows, seed) {
 }
 
 GameManager2048.prototype.startNewGame = function(seed) {
-	var newGrid = new Array(numColumns);
+	var newGrid = new Array(this.numColumns);
 	// Initialize the grid, and set all the values to 0 (So they are all empty)
-	for (i = 0; i < numColumns; i++) {
-		newGrid[i] = new Array(numRows)
+	for (i = 0; i < this.numColumns; i++) {
+		newGrid[i] = new Array(this.numRows)
 
-		for (j = 0; j < numRows; j++) {
+		for (j = 0; j < this.numRows; j++) {
 		  newGrid[i][j] = 0;
 		}
 	}

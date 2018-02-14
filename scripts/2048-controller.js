@@ -1,36 +1,36 @@
-/****************************************************/
-/*				      Global Varibables                   */
-/****************************************************/
-
-var bgCanvas = document.getElementById("background");
-var bgContext = bgCanvas.getContext("2d");
-
-var fgCanvas = document.getElementById("foreground");
-var fgContext = fgCanvas.getContext("2d");
-
-var backgroundColor = "#A88768";
-var tileColour = "#EEE4DA";
-var emptyTileColour = "rgba(238, 228, 218, 0.5)";
-
-// Used to get the size of the canvas
-var numColumns = 4;
-var numRows = 4;
-var tileRadius = 4
-var tileSize = 100;
-var tilePadding = 12.5;
-var actualTileSize = tileSize - tilePadding; 
-
-var gameManager = new GameManager2048(numColumns, numRows);
+var visuals;
 
 window.addEventListener("load", function(e) {
   window.addEventListener('keyup', this.keyboardInput, false);
 
-  resizeCanvases();
-  drawBackground(bgCanvas, bgContext);
-  
-  gameManager.startNewGame();
-  redrawTiles(fgContext);
+  visuals = new Visuals2048(4, 4, 100, 12.5);
 });
+
+function Visuals2048(col, row, size, padding) {
+  this.bgCanvas = document.getElementById("background");
+  this.bgContext = this.bgCanvas.getContext("2d");
+
+  this.fgCanvas = document.getElementById("foreground");
+  this.fgContext = this.fgCanvas.getContext("2d");
+
+  this.backgroundColor = "#A88768";
+  this.tileColour = "#EEE4DA";
+  this.emptyTileColour = "rgba(238, 228, 218, 0.5)";
+
+  this.numColumns = col;
+  this.numRows = row;
+  this.tileSize = size;
+  this.tilePadding = padding;
+  this.actualTileSize = this.tileSize - this.tilePadding; 
+
+  this.gameManager = new GameManager2048(this.numColumns, this.numRows);
+
+  this.resizeCanvases();
+  this.drawBackground(this.bgCanvas, this.bgContext);
+
+  this.gameManager.startNewGame();
+  this.redrawTiles(this.fgContext);
+}
 
 /****************************************************/
 /*                    Inputs                        */
@@ -40,25 +40,25 @@ function keyboardInput(e) {
 	switch (e.keyCode) { 
 		case 37:
 		case 65:
-			gameManager.moveLeft();
+			visuals.gameManager.moveLeft();
 			break;
 		case 38:
 		case 87:
-			gameManager.moveUp();
+			visuals.gameManager.moveUp();
 			break;
 		case 39:
 		case 68:
-			gameManager.moveRight();
+			visuals.gameManager.moveRight();
 			break;
 		case 40:
 		case 83:
-			gameManager.moveDown();
+			visuals.gameManager.moveDown();
 			break;
 		default:
 		  	return;
 	}
 
-	redrawTiles(fgContext);
+	visuals.redrawTiles(visuals.fgContext);
 }
 
 
@@ -66,33 +66,33 @@ function keyboardInput(e) {
 /*                 Visuals/Drawing                  */
 /****************************************************/
 
-function resizeCanvases() {
-	var canvasWidth = numColumns * tileSize + tilePadding;
-	var canvasHeight = numRows * tileSize + tilePadding;
+Visuals2048.prototype.resizeCanvases = function() {
+	var canvasWidth = this.numColumns * this.tileSize + this.tilePadding;
+	var canvasHeight = this.numRows * this.tileSize + this.tilePadding;
 
-	bgCanvas.width = canvasWidth;
-	bgCanvas.height = canvasHeight;
+	this.bgCanvas.width = canvasWidth;
+	this.bgCanvas.height = canvasHeight;
 
-	fgCanvas.width = canvasWidth;
-	fgCanvas.height = canvasHeight;
+	this.fgCanvas.width = canvasWidth;
+	this.fgCanvas.height = canvasHeight;
 }
 
-function drawBackground(canvas, context) {  
-  context.fillStyle = emptyTileColour;
+Visuals2048.prototype.drawBackground = function(canvas, context) {  
+  context.fillStyle = this.emptyTileColour;
   
   // Everything gets drawn like a normal grid, but moved across and down by tilePadding.
-  for (i = 0; i < numRows; i++) {
-    for (j = 0; j < numColumns; j++) {
-      var y = (i * tileSize) + tilePadding;
-      var x = (j * tileSize) + tilePadding;
+  for (i = 0; i < this.numRows; i++) {
+    for (j = 0; j < this.numColumns; j++) {
+      var y = (i * this.tileSize) + this.tilePadding;
+      var x = (j * this.tileSize) + this.tilePadding;
       
-      drawRoundedRect(context, x, y, actualTileSize, tileRadius);
+      this.drawRoundedRect(context, x, y, this.actualTileSize, 4);
     }
   }
 }
 
 // Helper function to draw a rect with curved corners - Looks slightly nicer
-function drawRoundedRect(ctx, x, y, size, radius) {
+Visuals2048.prototype.drawRoundedRect = function(ctx, x, y, size, radius) {
   ctx.beginPath();
   ctx.moveTo(x+radius, y);
   ctx.lineTo(x+size-radius, y);
@@ -106,29 +106,26 @@ function drawRoundedRect(ctx, x, y, size, radius) {
   ctx.fill();  
 }
 
-function redrawTiles(context) {
-  if (!gameManager)
-    return;
+Visuals2048.prototype.redrawTiles = function(context) {
+  context.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
 
-  context.clearRect(0, 0, fgCanvas.width, fgCanvas.height);
+  for (i = 0; i < this.numColumns; i++) {
+    for (j = 0; j < this.numRows; j++) {
+      var xPos = (i * this.tileSize) + this.tilePadding;
+      var yPos = (j * this.tileSize) + this.tilePadding;
 
-  for (i = 0; i < numColumns; i++) {
-    for (j = 0; j < numRows; j++) {
-      var xPos = (i * tileSize) + tilePadding;
-      var yPos = (j * tileSize) + tilePadding;
-
-      var val = gameManager.grid[i][j];
-      drawTile(context, val, xPos, yPos, actualTileSize)
+      var val = this.gameManager.grid[i][j];
+      this.drawTile(context, val, xPos, yPos, this.actualTileSize)
     }
   }
 }
-var max = 0
-function drawTile(context, value, x, y, size) {
+
+Visuals2048.prototype.drawTile = function(context, value, x, y, size) {
   if (value == 0)
     return;
   
-  context.fillStyle = tileColour;
-  drawRoundedRect(context, x, y, size, tileRadius);
+  context.fillStyle = this.tileColour;
+  this.drawRoundedRect(context, x, y, size, 4);
   
   // Set up the text
   context.fillStyle = "#000";
