@@ -1,19 +1,31 @@
+body, html {
+	height: 100%;
+	width: 100%;
+
+	margin: 0;
+}
+
 #background {
 	background: #bbada0;
 	z-index: -1;
 }
 
-/* Center the canvases */
-canvas {
-  position: absolute;
-  top:0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto auto;
+/* Overlap the canvases */
+#foreground {
+	margin-left: -415px;
+	z-index: 10;
 }
 
-#chartContainer {
-	position: absolute;
-	bottom: 0;
+.game-container {
+	position: relative;
+	top: 50%;
+	transform: translateY(-55%);
+	text-align: center;
+	overflow: auto;
+	margin: auto;
+}
+
+.game-board-container {
+  display: block;
+  margin: auto;
 }

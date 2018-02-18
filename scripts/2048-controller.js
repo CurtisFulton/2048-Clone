@@ -1,9 +1,10 @@
 var visuals;
 
 window.addEventListener("load", function(e) {
-  window.addEventListener('keyup', this.keyboardInput, false);
-
   visuals = new Visuals2048(4, 4, 100, 12.5);
+
+  window.addEventListener('keyup', this.keyboardInput, false);
+  document.getElementById('restart').addEventListener('click', () => visuals.startNewGame());
 });
 
 function Visuals2048(col, row, size, padding) {
@@ -61,10 +62,15 @@ function keyboardInput(e) {
 	visuals.redrawTiles(visuals.fgContext);
 }
 
-
 /****************************************************/
 /*                 Visuals/Drawing                  */
 /****************************************************/
+
+Visuals2048.prototype.startNewGame = function() {
+  this.gameManager.startNewGame(Math.random() * 10000);
+
+  this.redrawTiles(this.fgContext);
+}
 
 Visuals2048.prototype.resizeCanvases = function() {
 	var canvasWidth = this.numColumns * this.tileSize + this.tilePadding;

@@ -15,6 +15,7 @@ function GameManager2048(columns, rows, seed) {
 
 GameManager2048.prototype.startNewGame = function(seed) {
 	var newGrid = new Array(this.numColumns);
+
 	// Initialize the grid, and set all the values to 0 (So they are all empty)
 	for (i = 0; i < this.numColumns; i++) {
 		newGrid[i] = new Array(this.numRows)
@@ -23,6 +24,7 @@ GameManager2048.prototype.startNewGame = function(seed) {
 		  newGrid[i][j] = 0;
 		}
 	}
+	
 	this.grid = newGrid;
 	this.score = 0;
 	this.myRng = new Math.seedrandom(seed || this.seed);
@@ -52,7 +54,7 @@ GameManager2048.prototype.addNewTile = function() {
     var startingVal = Math.floor((this.myRng.quick() * 2) + 1);
     this.grid[newPos.x][newPos.y] = startingVal;
 
-    if (possibleIndexes.length <= 1 && !this.movementPossible()) {
+    if (possibleIndexes.length <= 1 && !this.movementPossible() && this.onGameOver) {
 		this.onGameOver();
 		return;
 	}
@@ -136,11 +138,11 @@ GameManager2048.prototype.movementPossible = function() {
 			// This is only because that is the order the loops run in.
 
 			// Check down
-			if (y != (numRows - 1) && this.grid[x][y + 1] == tileVal)
+			if (y != (this.numRows - 1) && this.grid[x][y + 1] == tileVal)
 				return true;
 
 			// Check right
-			if (x != (numColumns - 1) && this.grid[x + 1][y] == tileVal)
+			if (x != (this.numColumns - 1) && this.grid[x + 1][y] == tileVal)
 				return true;
 		}
 	}

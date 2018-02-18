@@ -4,11 +4,20 @@
 	<title>2048 Clone</title>
 
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.3/seedrandom.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.3/seedrandom.min.js" async defer></script>
 </head>
 <body>
-	<canvas id="background"></canvas>
-	<canvas id="foreground"></canvas>
+	<div class="game-container">
+		<h1 class="game-title">2048 Clone</h1>
+		<span class="label">Score: </span> <span id="score">0</span>
+		<span class="label">Total moves: </span> <span id="moves">0</span>
+		<button id="restart">Restart</button>
+
+		<div class="game-board-container">
+			<canvas id="background" class="game-board"></canvas>
+			<canvas id="foreground" class="game-board"></canvas>
+		</div>
+	</div>
 
 	<script type="text/javascript" src="scripts/2048.js"></script>
 	<script type="text/javascript" src="scripts/2048-controller.js"></script>
