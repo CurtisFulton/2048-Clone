@@ -118,7 +118,54 @@ Visuals2048.prototype.animateMovement = function(totalMoveTime, tiles, context) 
 
     totalTime += deltaTime;
     prevTime = time;
+
     if (totalTime > totalMoveTime) {
+      visuals.animateMerges(0.15, tiles, context);
+    } else {
+      window.requestAnimationFrame(moveTiles);
+    }
+  }
+
+  window.requestAnimationFrame(moveTiles);
+}
+
+Visuals2048.prototype.animateMerges = function(totalMergeTime, tiles, context) {
+  var totalTime = 0;  
+  var prevTime;
+
+  function moveTiles(time) {
+    if (!prevTime)
+      prevTime = time;
+    
+    let deltaTime = (time - prevTime) / 1000;
+    context.clearRect(0, 0, visuals.fgCanvas.width, visuals.fgCanvas.height);
+    visuals.redrawTiles(visuals.fgContext);
+
+    tiles.forEach((tile) => {
+      if (!tile.combined)
+        return;
+
+      let percent = totalTime / (totalMergeTime / 2);
+      let size = 0;
+      let x, y;
+
+      if (percent < 1){
+        size = visuals.lerp(visuals.actualTileSize, visuals.tileSize, percent);
+        x = visuals.lerp((tile.currentX * visuals.tileSize) + visuals.tilePadding, tile.currentX * visuals.tileSize + (visuals.tilePadding / 2), percent);
+        y = visuals.lerp((tile.currentY * visuals.tileSize) + visuals.tilePadding, tile.currentY * visuals.tileSize + (visuals.tilePadding / 2), percent);
+      } else {
+        size = visuals.lerp(visuals.tileSize, visuals.actualTileSize, percent % 1);
+        x = visuals.lerp((tile.currentX * visuals.tileSize) + (visuals.tilePadding / 2), (tile.currentX * visuals.tileSize) + visuals.tilePadding, percent % 1);
+        y = visuals.lerp((tile.currentY * visuals.tileSize) + (visuals.tilePadding / 2), (tile.currentY * visuals.tileSize) + visuals.tilePadding, percent % 1);
+      }
+
+      visuals.drawTile(context, tile.value + 1, x, y, size)
+    });
+
+    totalTime += deltaTime;
+    prevTime = time;
+
+    if (totalTime > totalMergeTime) {
       visuals.redrawTiles(visuals.fgContext);
       visuals.movementQueue = [];
     } else {
@@ -127,6 +174,7 @@ Visuals2048.prototype.animateMovement = function(totalMoveTime, tiles, context) 
   }
 
   window.requestAnimationFrame(moveTiles);
+
 }
 
 Visuals2048.prototype.resizeCanvases = function() {
