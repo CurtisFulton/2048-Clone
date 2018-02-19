@@ -2,7 +2,7 @@
 
 ## Synopsis
 
-A recreated the app 2048 using HTML5 Canvas. The only thing not written by me is the [seeded random](https://github.com/davidbau/seedrandom) 
+A recreation of the 2048 app using HTML5 Canvas. The only thing not written by me is the [seeded random](https://github.com/davidbau/seedrandom). Animations are not currently implemented yet. 
 
 ## Live Code
 

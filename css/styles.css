@@ -17,12 +17,51 @@ body, html {
 }
 
 .game-container {
+	display: inline-block;
 	position: relative;
+
 	top: 50%;
-	transform: translateY(-55%);
+	left: 50%;
+	transform: translate(-55%, -55%);
+
 	text-align: center;
 	overflow: auto;
 	margin: auto;
+}
+
+.game-title {
+	display: inline-block;
+	margin-right: 1em;
+	text-align: left;
+	font-size: 2.5em;
+	color: #67625C;
+	font-weight: bold;
+}
+
+.info {
+	display: inline-block;
+	padding: 0.3em 1.5em;
+	background-color: #bbada0;
+	color: white;
+	border-radius: 4px;
+}
+
+.label {
+	font-size: 0.7em;
+}
+
+#score, #moves {
+	font-size: 1.4em;
+}
+
+.about-game {
+	margin-top: -0.5em;
+	margin-bottom: 2em;
+	text-align: left;
+}
+
+.how-to-play {
+	text-align: center;
 }
 
 .game-board-container {

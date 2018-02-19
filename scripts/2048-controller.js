@@ -1,10 +1,14 @@
 var visuals;
+var score;
+var moves;
 
 window.addEventListener("load", function(e) {
   visuals = new Visuals2048(4, 4, 100, 12.5);
 
   window.addEventListener('keyup', this.keyboardInput, false);
-  document.getElementById('restart').addEventListener('click', () => visuals.startNewGame());
+  //document.getElementById('restart').addEventListener('click', () => visuals.startNewGame());
+  score = document.getElementById('score');
+  moves = document.getElementById('moves');
 });
 
 function Visuals2048(col, row, size, padding) {
@@ -38,28 +42,33 @@ function Visuals2048(col, row, size, padding) {
 /****************************************************/
 
 function keyboardInput(e) {
+  var tilesMoved;
 	switch (e.keyCode) { 
 		case 37:
 		case 65:
-			visuals.gameManager.moveLeft();
+			tilesMoved = visuals.gameManager.moveLeft();
 			break;
 		case 38:
 		case 87:
-			visuals.gameManager.moveUp();
+			tilesMoved = visuals.gameManager.moveUp();
 			break;
 		case 39:
 		case 68:
-			visuals.gameManager.moveRight();
+			tilesMoved = visuals.gameManager.moveRight();
 			break;
 		case 40:
 		case 83:
-			visuals.gameManager.moveDown();
+			tilesMoved = visuals.gameManager.moveDown();
 			break;
 		default:
 		  	return;
 	}
 
-	visuals.redrawTiles(visuals.fgContext);
+  if (tilesMoved) {
+    score.innerHTML = visuals.gameManager.score;
+    moves.innerHTML = parseInt(moves.innerHTML) + 1;
+    visuals.redrawTiles(visuals.fgContext);
+  }
 }
 
 /****************************************************/
