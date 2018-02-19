@@ -18,9 +18,9 @@ function Visuals2048(col, row, size, padding) {
   this.fgCanvas = document.getElementById("foreground");
   this.fgContext = this.fgCanvas.getContext("2d");
 
-  this.backgroundColor = "#A88768";
-  this.tileColour = "#EEE4DA";
-  this.emptyTileColour = "rgba(238, 228, 218, 0.5)";
+  this.backgroundColor = "#bbada0";
+  this.tileColour = ["#EEE6DB", "#ECE0C8", "#EFB27C", "#F39768", "#F37D63", "#F46042", "#EACF76", "#EDCB67", "#ECC85A", "#E7C258", "#E8BE4E"];
+  this.emptyTileColour = "#CBC2B3";
 
   this.numColumns = col;
   this.numRows = row;
@@ -139,14 +139,19 @@ Visuals2048.prototype.drawTile = function(context, value, x, y, size) {
   if (value == 0)
     return;
   
-  context.fillStyle = this.tileColour;
+  context.fillStyle = this.tileColour[Math.min(value - 1, this.tileColour.length - 1)];
   this.drawRoundedRect(context, x, y, size, 4);
-  
   // Set up the text
-  context.fillStyle = "#000";
-  context.font = "25px Arial"
+  context.fillStyle = value < 3 ? "#736E60" : "#FFF";
+  context.font = "bold 40px Open Sans"
   context.textAlign = "center";
   context.textBaseline = "middle";
+  
+  if (value > 6)
+    context.font = "bold 35px Open Sans"
+  if (value > 10)
+    context.font = "bold 30px Open Sans"
+
 
   var output = Math.pow(2, value);
 
