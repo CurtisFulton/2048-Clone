@@ -11,6 +11,8 @@ function GameManager2048(columns, rows, seed) {
 	this.score = 0;
 	this.seed = seed || Math.random() * 1092381024;
 	this.myRng = new Math.seedrandom(this.seed);
+
+	this.onTileMoved;
 }
 
 GameManager2048.prototype.startNewGame = function(seed) {
@@ -95,8 +97,20 @@ GameManager2048.prototype.moveBoard = function(xMov, yMov) {
 
 					this.grid[targetX][targetY] = tileVal;
 
-					if (targetX != x || targetY != y) 
+					if (targetX != x || targetY != y) {
 						numMovedTiles++;
+
+						if (this.onTileMoved)
+							this.onTileMoved(
+								{ 
+									startX : x, 
+									startY : y, 
+									value : tileVal,
+									endX : targetX,
+									endY : targetY,
+									combined : false
+								});
+					}
 					
 					break;
 				}
@@ -105,13 +119,37 @@ GameManager2048.prototype.moveBoard = function(xMov, yMov) {
 					if (this.grid[targetX][targetY] == tileVal) {
 						this.grid[targetX][targetY] += 1;
 						this.score += Math.pow(2, this.grid[targetX][targetY]);
-						if (targetX != x || targetY != y) 
+						if (targetX != x || targetY != y) {
 							numMovedTiles++;
+
+							if (this.onTileMoved)
+								this.onTileMoved(
+									{ 
+										startX : x, 
+										startY : y, 
+										value : tileVal,
+										endX : targetX,
+										endY : targetY,
+										combined : true
+									});
+						}
 					} else {
 						this.grid[targetX - xMov][targetY - yMov] = tileVal;
 
-						if (targetX - xMov != x || targetY - yMov != y) 
+						if (targetX - xMov != x || targetY - yMov != y) {
 							numMovedTiles++;
+
+							if (this.onTileMoved)
+								this.onTileMoved(
+									{ 
+										startX : x, 
+										startY : y, 
+										value : tileVal,
+										endX : targetX - xMov,
+										endY : targetY - yMov,
+										combined : false
+									});
+						}
 					}
 
 					break;

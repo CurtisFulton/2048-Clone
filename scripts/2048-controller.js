@@ -30,11 +30,11 @@ function Visuals2048(col, row, size, padding) {
 
   this.gameManager = new GameManager2048(this.numColumns, this.numRows);
 
-  this.resizeCanvases();
-  this.drawBackground(this.bgCanvas, this.bgContext);
+  this.animationTime = 0.5;
+  this.movementQueue = [];
+  this.gameManager.onTileMoved = this.tileMoved;
 
-  this.gameManager.startNewGame();
-  this.redrawTiles(this.fgContext);
+  this.startNewGame();
 }
 
 /****************************************************/
@@ -43,6 +43,10 @@ function Visuals2048(col, row, size, padding) {
 
 function keyboardInput(e) {
   var tilesMoved;
+  if (visuals.movementQueue.length > 0){
+    return;
+  }
+
 	switch (e.keyCode) { 
 		case 37:
 		case 65:
@@ -67,7 +71,9 @@ function keyboardInput(e) {
   if (tilesMoved) {
     score.innerHTML = visuals.gameManager.score;
     moves.innerHTML = parseInt(moves.innerHTML) + 1;
-    visuals.redrawTiles(visuals.fgContext);
+
+    visuals.animateMovement(0.1, visuals.movementQueue, visuals.fgContext);
+    //visuals.redrawTiles(visuals.fgContext);
   }
 }
 
@@ -75,10 +81,52 @@ function keyboardInput(e) {
 /*                 Visuals/Drawing                  */
 /****************************************************/
 
-Visuals2048.prototype.startNewGame = function() {
-  this.gameManager.startNewGame(Math.random() * 10000);
+Visuals2048.prototype.startNewGame = function() {  
+  this.resizeCanvases();
+  this.drawBackground(this.bgCanvas, this.bgContext);
 
+  this.gameManager.startNewGame(Math.random() * 10000);
   this.redrawTiles(this.fgContext);
+}
+
+Visuals2048.prototype.tileMoved = function(moveInfo) {  
+  moveInfo["currentX"] = moveInfo.startX;
+  moveInfo["currentY"] = moveInfo.startY;
+
+  visuals.movementQueue.push(moveInfo);
+}
+
+Visuals2048.prototype.animateMovement = function(totalMoveTime, tiles, context) {
+  var totalTime = 0;  
+  var prevTime;
+
+  function moveTiles(time) {
+    if (!prevTime)
+      prevTime = time;
+
+    let deltaTime = (time - prevTime) / 1000;
+
+    tiles.forEach((tile) => {
+      context.clearRect((tile.currentX * visuals.tileSize) + visuals.tilePadding - 1, (tile.currentY * visuals.tileSize) + visuals.tilePadding - 1, 92, 92);
+      var percent = totalTime / totalMoveTime;
+
+      tile.currentX = visuals.lerp(tile.startX, tile.endX, percent);
+      tile.currentY = visuals.lerp(tile.startY, tile.endY, percent);
+
+      visuals.drawTile(context, tile.value, (tile.currentX * visuals.tileSize) + visuals.tilePadding, (tile.currentY * visuals.tileSize)+ visuals.tilePadding, visuals.actualTileSize)
+    });
+
+    totalTime += deltaTime;
+    prevTime = time;
+    if (totalTime > totalMoveTime) {
+      visuals.redrawTiles(visuals.fgContext);
+      visuals.movementQueue = [];
+    } else {
+      window.requestAnimationFrame(moveTiles);
+    }
+  }
+
+  window.requestAnimationFrame(moveTiles);
 }
 
 Visuals2048.prototype.resizeCanvases = function() {
@@ -146,7 +194,7 @@ Visuals2048.prototype.drawTile = function(context, value, x, y, size) {
   context.font = "bold 40px Open Sans"
   context.textAlign = "center";
   context.textBaseline = "middle";
-  
+
   if (value > 6)
     context.font = "bold 35px Open Sans"
   if (value > 10)
@@ -157,3 +205,9 @@ Visuals2048.prototype.drawTile = function(context, value, x, y, size) {
 
   context.fillText(output, x + (size / 2.0), y + (size / 2.0));
 }
+
+Visuals2048.prototype.lerp = function (value1, value2, amount) {
+  amount = amount < 0 ? 0 : amount;
+  amount = amount > 1 ? 1 : amount;
+  return value1 + (value2 - value1) * amount;
+};
