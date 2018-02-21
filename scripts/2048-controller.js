@@ -60,8 +60,9 @@ function Visuals2048(col, row, size, padding) {
       // If the merging animation has been cut short, re-draw the board so there are no artifacts.
       if (this.mergeQueue.length != 0) {
         this.mergeQueue = [];
-        this.drawGameBoard();
       }
+      // Make sure the game board is up to date
+      this.drawGameBoard();
 
       // Handle any input
       if (applyMovement(this.nextInput)) {
@@ -96,6 +97,7 @@ function Visuals2048(col, row, size, padding) {
       }
 
     } else if (!this.isAnimating && totalTime <= this.animationMoveTime + this.animationMergeTime && this.mergeQueue.length > 0) {
+      this.isAnimating = false;
       let percent = totalTime / (this.animationMoveTime + this.animationMergeTime) * 2;
       
       if (percent > 1) 
@@ -103,6 +105,7 @@ function Visuals2048(col, row, size, padding) {
 
       mergeTiles(percent);
     } else {
+      this.isAnimating = false;
       // Animation is finished, clear queue and exit loop.
       this.mergeQueue = [];
       return;
