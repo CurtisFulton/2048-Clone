@@ -6,7 +6,7 @@ window.addEventListener("load", function(e) {
   visuals = new Visuals2048(4, 4, 100, 15);
 
   window.addEventListener('keyup', keyboardInput, false);
-  //document.getElementById('restart').addEventListener('click', () => visuals.startNewGame());
+  document.getElementById('restart').addEventListener('click', () => visuals.startNewGame());
   score = document.getElementById('score');
   moves = document.getElementById('moves');
 

@@ -159,6 +159,7 @@ function Visuals2048(col, row, size, padding) {
 }
 
 Visuals2048.prototype.startNewGame = function() {
+  console.log("Test");
   this.gameManager.startNewGame();
   this.drawGameBoard();
 }
