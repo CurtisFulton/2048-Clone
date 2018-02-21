@@ -199,15 +199,14 @@ Visuals2048.prototype.drawTile = function(x, y, value, size) {
   drawRoundedRect(ctx, xPos, yPos, size, size, 4 * this.canvasMultipler);
 
   // Set the font size
-  let fontSize = 40;
-  if (value > 6) fontSize = 35;
-  if (value > 10) fontSize = 30;
+  let fontSize = 55;
+  if (value > 6) fontSize = 45;
+  if (value > 10) fontSize = 35;
 
   fontSize *= this.canvasMultipler;
-
   // The font colour is white for all tiles above 2 (Board value of 4)
   ctx.fillStyle = value < 3 ? "#736E60" : "#FFF";
-  ctx.font = "bold " + fontSize + "px Open Sans";
+  ctx.font = "bolder " + fontSize + "px Open Sans";
 
   // Center the text so it shows up in the middle of the tile.
   ctx.textAlign = "center";

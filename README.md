@@ -4,9 +4,18 @@
 
 A recreation of the 2048 app using HTML5 Canvas. The only thing not written by me is the [seeded random](https://github.com/davidbau/seedrandom). Animations are not currently implemented yet. 
 
+**Note:** This uses grid CSS for the layout, so if it does not work, you may need to update your browser.
+
 ## Live Code
 
 A live version of the game can be found at https://curtisfulton.github.io/2048-Clone. This is still in development and will be updated more as time goes on.
+
+## Skills/Technologies
+
+- Grid CSS
+- HTML5 Canvas
+- Javascript
+- Prototypes
 
 ## Motivation
 
