@@ -1,10 +1,11 @@
 body, html {
+	background-color: #FAF8EF;
 	margin: 0;
 	font-family: 'Open Sans', sans-serif;
 }
 
 #background {
-	z-index: -1;
+	z-index: 1;
 	width: 100%;
 	height: 100%;
 }
@@ -17,17 +18,43 @@ body, html {
 
 .score, .moves {
 	text-align: center;
+	padding: 0.2em 0;
+	color: white;
+	background-color: #BBADA0;
+	border-radius: 4px;
+	font-weight: bold;
+	font-size: 1.5em;
+}
+
+.label {
+	font-size: 0.5em;
+}
+
+.restart {
+	grid-area: new-game;
+	height: 75%;
+
+	font-weight: bold;
+	font-size: 1.1em;
+
+	background-color: #8F7A66;
+	color: white;
+	border: none;
+	border-radius: 3px;
 }
 
 .game-container {
 	position: relative;
 
 	display: grid;
-	grid-template-rows: auto auto 500px auto;
+	grid-template-rows: auto auto 3em 500px auto;
+	grid-template-columns: 2fr 1fr 1fr;
+	grid-column-gap: 5px;
 
 	grid-template-areas: 
 	"title score moves"
-	"message message message"
+	"message message new-game"
+	"spacer spacer spacer"
 	"game-board game-board game-board"
 	"instruction instruction instruction";
 
@@ -56,7 +83,11 @@ body, html {
 }
 
 .game-title {
-	grid-area: title
+	grid-area: title;
+	color: #776E65;
+	font-weight: bolder;
+	font-size: 5em;
+	margin: 0 0;
 }
 
 .how-to-play {

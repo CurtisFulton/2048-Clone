@@ -9,27 +9,26 @@ function GameManager2048(columns, rows, seed) {
 	this.onGameOver;
 
 	this.score = 0;
-	this.seed = seed || Math.random() * 1092381024;
 	this.myRng = new Math.seedrandom(this.seed);
 
 	this.onTileMoved;
 }
 
 GameManager2048.prototype.startNewGame = function(seed) {
-	var newGrid = new Array(this.numColumns);
+	this.grid = new Array(this.numColumns);
 
 	// Initialize the grid, and set all the values to 0 (So they are all empty)
 	for (i = 0; i < this.numColumns; i++) {
-		newGrid[i] = new Array(this.numRows)
+		this.grid[i] = new Array(this.numRows)
 
 		for (j = 0; j < this.numRows; j++) {
-		  newGrid[i][j] = 0;
+		  this.grid[i][j] = 0;
 		}
 	}
 	
-	this.grid = newGrid;
+	// reset variables
 	this.score = 0;
-	this.myRng = new Math.seedrandom(seed || this.seed);
+	this.myRng = new Math.seedrandom(seed || Math.random() * 10000);
 
 	// Add 2 tiles to the starting board
 	this.addNewTile();
@@ -37,26 +36,24 @@ GameManager2048.prototype.startNewGame = function(seed) {
 }
 
 GameManager2048.prototype.addNewTile = function() {
-	var possibleIndexes = []
+	var emptyTiles = [];
 
+	// Add all empty tile coordinates to an array
 	for (i = 0; i < this.numColumns; i++) {
 		for (j = 0; j < this.numRows; j++) {
 			if (this.grid[i][j] == 0) {
-				possibleIndexes.push({ 
-					x : i,
-					y : j
-				});
+				emptyTiles.push({ x : i, y : j });
 			}
 		}
 	}
+	// Select a random value from the empty
+	let newPos = emptyTiles[Math.floor(this.myRng() * emptyTiles.length)];
 
-	var newIndex = Math.floor(this.myRng.quick() * possibleIndexes.length);
-	var newPos = possibleIndexes[newIndex];
-
-    var startingVal = Math.floor((this.myRng.quick() * 2) + 1);
+	// Choose the value that the new tile should start at. Will either be 1 or 2 (On the board that's 2 or 4)
+    let startingVal = this.myRng() < 0.5 ? 1 : 2;
     this.grid[newPos.x][newPos.y] = startingVal;
 
-    if (possibleIndexes.length <= 1 && !this.movementPossible() && this.onGameOver) {
+    if (emptyTiles.length <= 1 && !this.movementPossible() && this.onGameOver) {
 		this.onGameOver();
 		return;
 	}

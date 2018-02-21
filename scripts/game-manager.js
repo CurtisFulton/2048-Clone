@@ -3,7 +3,7 @@ var score;
 var moves;
 
 window.addEventListener("load", function(e) {
-  visuals = new Visuals2048(4, 4, 100, 12.5);
+  visuals = new Visuals2048(4, 4, 100, 15);
 
   window.addEventListener('keyup', keyboardInput, false);
   //document.getElementById('restart').addEventListener('click', () => visuals.startNewGame());
@@ -23,19 +23,19 @@ function keyboardInput(e) {
 	switch (e.keyCode) { 
 		case 37:
 		case 65:
-			tilesMoved = visuals.moveLeft();
+			tilesMoved = visuals.moveBoard("Left");
 			break;
 		case 38:
 		case 87:
-			tilesMoved = visuals.moveUp();
+			tilesMoved = visuals.moveBoard("Up");
 			break;
 		case 39:
 		case 68:
-			tilesMoved = visuals.moveRight();
+			tilesMoved = visuals.moveBoard("Right");
 			break;
 		case 40:
 		case 83:
-			tilesMoved = visuals.moveDown();
+			tilesMoved = visuals.moveBoard("Down");
 			break;
 		default:
 		  	return;
