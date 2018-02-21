@@ -9,8 +9,9 @@ function GameManager2048(columns, rows, seed) {
 	this.onGameOver;
 
 	this.score = 0;
-	this.myRng = new Math.seedrandom(this.seed);
+	this.numMoves = 0;
 
+	this.myRng = new Math.seedrandom(this.seed);
 	this.onTileMoved;
 }
 
@@ -28,6 +29,7 @@ GameManager2048.prototype.startNewGame = function(seed) {
 	
 	// reset variables
 	this.score = 0;
+	this.numMoves = 0;
 	this.myRng = new Math.seedrandom(seed || Math.random() * 10000);
 
 	// Add 2 tiles to the starting board
@@ -155,8 +157,10 @@ GameManager2048.prototype.moveBoard = function(xMov, yMov) {
 		}
 	}
 
-	if (numMovedTiles > 0)
+	if (numMovedTiles > 0){
   		this.addNewTile();
+  		this.numMoves++;
+	}
 
   	return numMovedTiles;
 }
@@ -184,20 +188,3 @@ GameManager2048.prototype.movementPossible = function() {
 
 	return false;
 }
-
-GameManager2048.prototype.moveLeft = function() {
-	return (this.moveBoard(-1, 0) > 0 ? true : false);
-}
-
-GameManager2048.prototype.moveRight = function() {
-	return (this.moveBoard(1, 0) > 0 ? true : false)
-}
-
-GameManager2048.prototype.moveUp = function() {
-	return (this.moveBoard(0, -1) > 0 ? true : false)
-}
-
-GameManager2048.prototype.moveDown = function() {
-	return (this.moveBoard(0, 1) > 0 ? true : false)
-}
-

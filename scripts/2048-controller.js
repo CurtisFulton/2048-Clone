@@ -20,9 +20,17 @@ function Visuals2048(col, row, size, padding) {
   this.gameManager = new GameManager2048(this.numColumns, this.numRows);
   this.nextInput = "";
 
+  this.animationMoveTime = 0.1;
+  this.animationMergeTime = 0.2;
+  this.isAnimating = false;
+
+  this.moveQueue = [];
+  this.mergeQueue = [];
+
   this.drawBackground();
 
-  // This is private so it cannot be forced to move during an animation
+  // This is private so it cannot be forced to move during an animation. 
+  // Arrow function used to preserve 'this' context
   var applyMovement = (direction) => {
     let movement = false;
 
@@ -43,21 +51,108 @@ function Visuals2048(col, row, size, padding) {
         console.log("Error - " + direction + " is not a valid movement");
     }
 
-    this.drawGameBoard();
     return movement;
   }
 
-  // Private animation loop
-  var animationLoop = () => {
-    if (this.nextInput && this.nextInput != ""){
-      applyMovement(this.nextInput);
-      this.nextInput = "";
+  // Private animation loop. Arrow function used to preserve 'this' context
+  var inputLoop = () => {
+    if (!this.isAnimating && this.nextInput && this.nextInput != "") {
+      // If the merging animation has been cut short, re-draw the board so there are no artifacts.
+      if (this.mergeQueue.length != 0) {
+        this.mergeQueue = [];
+        this.drawGameBoard();
+      }
+
+      // Handle any input
+      if (applyMovement(this.nextInput)) {
+        window.requestAnimationFrame(animationLoop);
+        this.nextInput = "";
+      }
     }
 
-    window.requestAnimationFrame(animationLoop);
+    window.requestAnimationFrame(inputLoop);
   }
 
-  animationLoop();
+  var animationLoop = (time, startTime, totalTime) => {
+    if (!startTime) {
+      startTime = time;
+      totalTime = 0;
+    }
+
+
+    if (totalTime <= this.animationMoveTime) {
+      this.isAnimating = true;
+
+      let percent = totalTime / this.animationMoveTime;
+
+      if (percent < 0.99) {
+        moveTiles(percent);
+      } else {
+        this.mergeQueue = this.moveQueue.filter(tile => tile.combined);
+        this.moveQueue = [];
+
+        this.drawGameBoard();
+        this.isAnimating = false;
+      }
+
+    } else if (!this.isAnimating && totalTime <= this.animationMoveTime + this.animationMergeTime && this.mergeQueue.length > 0) {
+      let percent = totalTime / (this.animationMoveTime + this.animationMergeTime) * 2;
+      
+      if (percent > 1) 
+        percent = 2 - percent;
+
+      mergeTiles(percent);
+    } else {
+      // Animation is finished, clear queue and exit loop.
+      this.mergeQueue = [];
+      return;
+    }
+
+    window.requestAnimationFrame((timeStamp) => {
+      animationLoop(timeStamp, startTime, (timeStamp - startTime) / 1000);
+    })
+  }
+
+  var moveTiles = (percent) => {
+    let ctx = this.fgContext;
+
+    this.moveQueue.forEach((tile) => {
+      let prevX = (tile.currentX * this.tileSize) + this.tilePadding - 1;
+      let prevY = (tile.currentY * this.tileSize) + this.tilePadding - 1;
+
+      ctx.clearRect(prevX, prevY, this.realTileSize + 2, this.realTileSize + 2);
+
+      tile.currentX = lerp(tile.startX, tile.endX, percent);
+      tile.currentY = lerp(tile.startY, tile.endY, percent);
+
+      this.drawTile(tile.currentX, tile.currentY, tile.value, this.realTileSize);
+    });
+  }
+
+  var mergeTiles = (percent) => {
+    let ctx = this.fgContext;
+    let percentIncrease = 0.1;
+
+    ctx.clearRect(0, 0, this.fgCanvas.width, this.fgCanvas.height);
+    this.drawGameBoard();
+
+    this.mergeQueue.forEach((tile) => {
+      let x = lerp(tile.endX, tile.endX - (percentIncrease / 2), percent);
+      let y = lerp(tile.endY, tile.endY - (percentIncrease / 2), percent);
+
+      let size = lerp(this.realTileSize, this.realTileSize * (1 + percentIncrease), percent);
+
+      this.drawTile(x, y, tile.value + 1, size);
+    });
+  }
+
+  inputLoop();
+  this.gameManager.onTileMoved = (moveInfo) => {
+    moveInfo["currentX"] = moveInfo.startX;
+    moveInfo["currentY"] = moveInfo.startY;
+
+    this.moveQueue.push(moveInfo);
+  };
 }
 
 Visuals2048.prototype.startNewGame = function() {
@@ -67,6 +162,11 @@ Visuals2048.prototype.startNewGame = function() {
 
 Visuals2048.prototype.moveBoard = function(direction) {
   this.nextInput = direction;
+}
+
+Visuals2048.prototype.animateMovement = function() {
+  this.gameManager.startNewGame();
+  this.drawGameBoard();
 }
 
 // Draws what the current gameboard looks like.
@@ -81,12 +181,12 @@ Visuals2048.prototype.drawGameBoard = function() {
       if (this.gameManager.grid[i][j] == 0)
         continue;
 
-      this.drawTile(i, j, this.gameManager.grid[i][j]);
+      this.drawTile(i, j, this.gameManager.grid[i][j], this.realTileSize);
     }
   }
 }
 
-Visuals2048.prototype.drawTile = function(x, y, value) {
+Visuals2048.prototype.drawTile = function(x, y, value, size) {
   let ctx = this.fgContext;
   let bgColour = this.tileColour[Math.min(value, this.tileColour.length)];
 
@@ -96,7 +196,7 @@ Visuals2048.prototype.drawTile = function(x, y, value) {
 
   // Draw the tile
   ctx.fillStyle = bgColour;
-  drawRoundedRect(ctx, xPos, yPos, this.realTileSize, this.realTileSize, 4 * this.canvasMultipler);
+  drawRoundedRect(ctx, xPos, yPos, size, size, 4 * this.canvasMultipler);
 
   // Set the font size
   let fontSize = 40;
@@ -114,7 +214,11 @@ Visuals2048.prototype.drawTile = function(x, y, value) {
   ctx.textBaseline = "middle";
 
   // Draw the value inside tile. We need to raise 2 to the power of the tile value to get the display value.
-  ctx.fillText(Math.pow(2, value), xPos + (this.realTileSize / 2.0), yPos + (this.realTileSize / 2.0));
+  ctx.fillText(Math.pow(2, value), xPos + (size / 2.0), yPos + (size / 2.0));
+}
+
+// Draws what the current gameboard looks like.
+Visuals2048.prototype.resizeCanvases = function() {
 }
 
 // Draws the background for the game board. This includes the empty tiles.

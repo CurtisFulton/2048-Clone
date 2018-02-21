@@ -11,6 +11,7 @@ window.addEventListener("load", function(e) {
   moves = document.getElementById('moves');
 
   visuals.startNewGame();
+  updateScore();
 });
 
 /****************************************************/
@@ -18,31 +19,39 @@ window.addEventListener("load", function(e) {
 /****************************************************/
 
 function keyboardInput(e) {
-	var tilesMoved;
+	let direction = "";
 
 	switch (e.keyCode) { 
 		case 37:
 		case 65:
-			tilesMoved = visuals.moveBoard("Left");
+			direction = "Left";
 			break;
 		case 38:
 		case 87:
-			tilesMoved = visuals.moveBoard("Up");
+			direction = "Up";
 			break;
 		case 39:
 		case 68:
-			tilesMoved = visuals.moveBoard("Right");
+			direction = "Right";
 			break;
 		case 40:
 		case 83:
-			tilesMoved = visuals.moveBoard("Down");
+			direction ="Down";
 			break;
 		default:
 		  	return;
 	}
 
-	if (tilesMoved) {
-		score.innerHTML = visuals.gameManager.score;
-		moves.innerHTML = parseInt(moves.innerHTML) + 1;
-	}
+	let tilesMoved = visuals.moveBoard(direction);
+
+	score.innerHTML = visuals.gameManager.score;
+	moves.innerHTML = visuals.gameManager.numMoves;
+	
+}
+
+function updateScore() {
+	score.innerHTML = visuals.gameManager.score;
+	moves.innerHTML = visuals.gameManager.numMoves;
+
+	window.requestAnimationFrame(updateScore);
 }
