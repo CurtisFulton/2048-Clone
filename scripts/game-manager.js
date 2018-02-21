@@ -2,6 +2,9 @@ var visuals;
 var score;
 var moves;
 
+var startPos;
+var endPos;
+
 window.addEventListener("load", function(e) {
   visuals = new Visuals2048(4, 4, 100, 15);
 
@@ -9,6 +12,10 @@ window.addEventListener("load", function(e) {
   document.getElementById('restart').addEventListener('click', () => visuals.startNewGame());
   score = document.getElementById('score');
   moves = document.getElementById('moves');
+
+  visuals.fgCanvas.addEventListener("touchstart", touchStart);
+  visuals.fgCanvas.addEventListener("touchmove", touchMove);
+  visuals.fgCanvas.addEventListener("touchend", touchEnd);
 
   visuals.startNewGame();
   updateScore();
@@ -39,6 +46,7 @@ function keyboardInput(e) {
 			direction ="Down";
 			break;
 		default:
+			console.log(e.keyCode);
 		  	return;
 	}
 
@@ -47,6 +55,43 @@ function keyboardInput(e) {
 	score.innerHTML = visuals.gameManager.score;
 	moves.innerHTML = visuals.gameManager.numMoves;
 	
+}
+
+function touchStart(e) {
+  	startPos = e.touches[0];
+  	endPos = startPos;
+}
+
+function touchMove(e) {
+  	endPos = e.touches[0];
+}
+
+function touchEnd(e) {
+	if (endPos == startPos)
+		return;
+
+	let dist = {
+		x : endPos.clientX - startPos.clientX,
+		y : endPos.clientY - startPos.clientY,
+	}
+
+	let key = 0;
+
+	// Determine which direction the swipe was in.
+	if (Math.abs(dist.x) > Math.abs(dist.y)) {
+		if (dist.x < 0)
+			key = 65;
+		else 
+			key = 68;
+	} else {
+		if (dist.y < 0)
+			key = 87
+		else 
+			key = 83;
+	}
+
+	// Create an object with keycode to route it through the keypress function
+    keyboardInput({ keyCode : key });
 }
 
 function updateScore() {
