@@ -1,71 +1,64 @@
 body, html {
-	height: 100%;
-	width: 100%;
-
 	margin: 0;
 	font-family: 'Open Sans', sans-serif;
 }
 
 #background {
-	background: #bbada0;
 	z-index: -1;
+	width: 100%;
+	height: 100%;
 }
 
-/* Overlap the canvases */
 #foreground {
-	margin-left: -415px;
 	z-index: 10;
+	width: 100%;
+	height: 100%;
+}
+
+.score, .moves {
+	text-align: center;
 }
 
 .game-container {
-	display: inline-block;
 	position: relative;
 
-	top: 50%;
-	left: 50%;
-	transform: translate(-55%, -55%);
+	display: grid;
+	grid-template-rows: auto auto 500px auto;
 
-	text-align: center;
-	overflow: auto;
+	grid-template-areas: 
+	"title score moves"
+	"message message message"
+	"game-board game-board game-board"
+	"instruction instruction instruction";
+
 	margin: auto;
+	margin-top: 5em;
+	width: 500px;
+	align-items: center;
+}
+
+/*   Grid Area definitions   */
+
+.game-board {
+	grid-area: game-board;
+}
+
+.score {
+	grid-area: score;
+}
+
+.moves {
+	grid-area: moves;
+}
+
+.about-game{
+	grid-area: message;
 }
 
 .game-title {
-	display: inline-block;
-	margin-right: 1em;
-	text-align: left;
-	font-size: 2.5em;
-	color: #67625C;
-	font-weight: bold;
-}
-
-.info {
-	display: inline-block;
-	padding: 0.3em 1.5em;
-	background-color: #bbada0;
-	color: white;
-	border-radius: 4px;
-}
-
-.label {
-	font-size: 0.7em;
-}
-
-#score, #moves {
-	font-size: 1.4em;
-}
-
-.about-game {
-	margin-top: -0.5em;
-	margin-bottom: 2em;
-	text-align: left;
+	grid-area: title
 }
 
 .how-to-play {
-	text-align: center;
-}
-
-.game-board-container {
-  display: block;
-  margin: auto;
+	grid-area: instruction;
 }
