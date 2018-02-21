@@ -74,10 +74,20 @@ function Visuals2048(col, row, size, padding) {
     window.requestAnimationFrame(inputLoop);
   }
 
-  var animationLoop = (time, startTime, totalTime) => {
+  var animationLoop = (time, startTime, prevTotal) => {
     if (!startTime) {
       startTime = time;
-      totalTime = 0;
+    }
+
+    let totalTime = (time - startTime) / 1000;
+
+    // If this is the frame it finished animating the movement
+    if (prevTotal <= this.animationMoveTime && totalTime > this.animationMoveTime) {
+      this.mergeQueue = this.moveQueue.filter(tile => tile.combined);
+      this.moveQueue = [];
+
+      this.drawGameBoard();
+      this.isAnimating = false;
     }
 
 
@@ -86,18 +96,9 @@ function Visuals2048(col, row, size, padding) {
 
       let percent = totalTime / this.animationMoveTime;
 
-      if (percent < 0.99) {
-        moveTiles(percent);
-      } else {
-        this.mergeQueue = this.moveQueue.filter(tile => tile.combined);
-        this.moveQueue = [];
-
-        this.drawGameBoard();
-        this.isAnimating = false;
-      }
+      moveTiles(percent);
 
     } else if (!this.isAnimating && totalTime <= this.animationMoveTime + this.animationMergeTime && this.mergeQueue.length > 0) {
-      this.isAnimating = false;
       let percent = totalTime / (this.animationMoveTime + this.animationMergeTime) * 2;
       
       if (percent > 1) 
@@ -105,14 +106,13 @@ function Visuals2048(col, row, size, padding) {
 
       mergeTiles(percent);
     } else {
-      this.isAnimating = false;
       // Animation is finished, clear queue and exit loop.
       this.mergeQueue = [];
       return;
     }
 
     window.requestAnimationFrame((timeStamp) => {
-      animationLoop(timeStamp, startTime, (timeStamp - startTime) / 1000);
+      animationLoop(timeStamp, startTime, totalTime);
     })
   }
 
