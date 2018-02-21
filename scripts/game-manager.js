@@ -60,10 +60,12 @@ function keyboardInput(e) {
 function touchStart(e) {
   	startPos = e.touches[0];
   	endPos = startPos;
+  	e.preventDefault();
 }
 
 function touchMove(e) {
   	endPos = e.touches[0];
+  	e.preventDefault();
 }
 
 function touchEnd(e) {

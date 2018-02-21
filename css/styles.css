@@ -97,3 +97,16 @@ canvas {
 .how-to-play {
 	grid-area: instruction;
 }
+
+@media (max-width: 520px) {
+.game-container {
+	position: relative;
+
+	display: grid;
+	grid-template-rows: auto auto 3em 100vw auto;
+
+	margin-top: 0em;
+	width: 100%;
+	align-items: center;
+}
+}
