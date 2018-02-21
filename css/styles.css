@@ -1,71 +1,95 @@
 body, html {
-	height: 100%;
-	width: 100%;
-
+	background-color: #FAF8EF;
 	margin: 0;
 	font-family: 'Open Sans', sans-serif;
 }
 
 #background {
-	background: #bbada0;
-	z-index: -1;
+	z-index: 1;
+	width: 100%;
+	height: 100%;
 }
 
-/* Overlap the canvases */
 #foreground {
-	margin-left: -415px;
 	z-index: 10;
+	width: 100%;
+	height: 100%;
 }
 
-.game-container {
-	display: inline-block;
-	position: relative;
-
-	top: 50%;
-	left: 50%;
-	transform: translate(-55%, -55%);
-
+.score, .moves {
 	text-align: center;
-	overflow: auto;
-	margin: auto;
-}
-
-.game-title {
-	display: inline-block;
-	margin-right: 1em;
-	text-align: left;
-	font-size: 2.5em;
-	color: #67625C;
-	font-weight: bold;
-}
-
-.info {
-	display: inline-block;
-	padding: 0.3em 1.5em;
-	background-color: #bbada0;
+	padding: 0.2em 0;
 	color: white;
+	background-color: #BBADA0;
 	border-radius: 4px;
+	font-weight: bold;
+	font-size: 1.5em;
 }
 
 .label {
-	font-size: 0.7em;
+	font-size: 0.5em;
 }
 
-#score, #moves {
-	font-size: 1.4em;
+.restart {
+	grid-area: new-game;
+	height: 3em;
+
+	font-weight: bold;
+	font-size: 1.1em;
+
+	background-color: #8F7A66;
+	color: white;
+	border: none;
+	border-radius: 3px;
 }
 
-.about-game {
-	margin-top: -0.5em;
-	margin-bottom: 2em;
-	text-align: left;
+.game-container {
+	position: relative;
+
+	display: grid;
+	grid-template-rows: auto auto 3em 500px auto;
+	grid-template-columns: 2fr 1fr 1fr;
+	grid-column-gap: 5px;
+
+	grid-template-areas: 
+	"title score moves"
+	"message message new-game"
+	"spacer spacer spacer"
+	"game-board game-board game-board"
+	"instruction instruction instruction";
+
+	margin: auto;
+	margin-top: 2em;
+	width: 500px;
+	align-items: center;
+}
+
+/*   Grid Area definitions   */
+
+.game-board {
+	grid-area: game-board;
+}
+
+.score {
+	grid-area: score;
+}
+
+.moves {
+	grid-area: moves;
+}
+
+.about-game{
+	grid-area: message;
+}
+
+.game-title {
+	grid-area: title;
+	color: #776E65;
+	font-weight: bolder;
+	font-size: 5em;
+	margin: 0 0;
 }
 
 .how-to-play {
-	text-align: center;
-}
-
-.game-board-container {
-  display: block;
-  margin: auto;
+	grid-area: instruction;
 }
